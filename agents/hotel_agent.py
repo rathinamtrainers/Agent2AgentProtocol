@@ -225,7 +225,7 @@ class HotelAgentExecutor(AgentExecutor):
                 for h in hotels:
                     h = dict(h)
                     h["city"] = user_input.title() or "Unknown"
-            result_data = hotels
+            result_data = {"hotels": hotels}
             logger.info("Hotel search for city: %s — found %d hotels", city, len(hotels))
 
         # ── Emit artifact (DataPart) ──────────────────────────────────────────

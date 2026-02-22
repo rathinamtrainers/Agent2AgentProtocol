@@ -140,6 +140,8 @@ async def call_hotel_agent(query: str) -> list[dict]:
                 for part in task.artifacts[0].parts:
                     if isinstance(part.root, DataPart):
                         data = part.root.data
+                        if isinstance(data, dict) and "hotels" in data:
+                            return data["hotels"]
                         return data if isinstance(data, list) else [data]
     except Exception as exc:
         logger.warning("Hotel agent call failed: %s", exc)

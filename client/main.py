@@ -199,7 +199,7 @@ async def demo_section3_basic_task() -> None:
                 info(f"Artifact name: {artifact.name}")
                 for part in artifact.parts:
                     if isinstance(part.root, DataPart):
-                        hotels = part.root.data
+                        hotels = part.root.data.get("hotels", [])
                         ok(f"Received {len(hotels)} hotels:")
                         for h in hotels[:2]:
                             info(f"  {h['name']} ({h['stars']}★) — ${h['price_per_night_usd']}/night")
