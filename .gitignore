@@ -1,0 +1,12 @@
+.venv/
+pptx_venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.egg-info/
+dist/
+build/
+.DS_Store
+create_pptx_part1.py
+samples/requirements.txt

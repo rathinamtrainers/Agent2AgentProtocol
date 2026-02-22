@@ -1,0 +1,89 @@
+services:
+
+  flight-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python agents/flight_agent.py
+    ports:
+      - "8001:8001"
+    environment:
+      - FLIGHT_BEARER_TOKEN=flight-secret-token
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-H", "Authorization: Bearer flight-secret-token",
+             "http://localhost:8001/.well-known/agent.json"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  hotel-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python agents/hotel_agent.py
+    ports:
+      - "8002:8002"
+    environment:
+      - HOTEL_API_KEY=hotel-api-key-12345
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-H", "X-Api-Key: hotel-api-key-12345",
+             "http://localhost:8002/.well-known/agent.json"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  booking-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python agents/booking_agent.py
+    ports:
+      - "8003:8003"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/.well-known/agent.json"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  weather-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python agents/weather_agent.py
+    ports:
+      - "8004:8004"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/.well-known/agent.json"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python orchestrator/travel_orchestrator.py
+    ports:
+      - "8010:8010"
+    depends_on:
+      flight-agent:
+        condition: service_healthy
+      hotel-agent:
+        condition: service_healthy
+      booking-agent:
+        condition: service_healthy
+      weather-agent:
+        condition: service_healthy
+    environment:
+      - FLIGHT_BEARER_TOKEN=flight-secret-token
+      - HOTEL_API_KEY=hotel-api-key-12345
+
+  webhook-receiver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python client/webhook_receiver.py
+    ports:
+      - "9000:9000"
+    environment:
+      - WEBHOOK_SECRET_TOKEN=webhook-secret-token
